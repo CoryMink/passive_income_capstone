@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In[70]:
+# In[9]:
 
 
 import pandas    as pd
@@ -9,17 +9,12 @@ import numpy     as np
 import yfinance  as yf
 import pandas_ta as ta
 import datetime  as dt
+import time
 from sklearn.model_selection  import train_test_split
 from sklearn.linear_model     import LinearRegression
 
 
-# In[71]:
-
-
-lists = ['EURUSD=X','GBPUSD=x','USDJPY=x','USDCHF=x','USDCAD=x','AUDUSD=x','NZDUSD=x']
-
-
-# In[72]:
+# In[10]:
 
 
 def get_pred(sym):
@@ -31,27 +26,78 @@ def get_pred(sym):
     tickers=sym
     enddate = dt.datetime.now()
     startdate = enddate - dt.timedelta(minutes=15000)
-    lists = []
+    lists1 = []
     for intervals in['15m','30m','60m','90m']:
         data = yf.download(tickers=tickers, start=startdate, end=enddate, interval=intervals,progress=False)
         data['NextClose'] = data['Close'].shift(-1)
-        data.dropna(inplace=True)
         data.reset_index(inplace=True)
+        data.dropna(inplace=True)
         X = data[['Open','High','Low']]
         y = data['NextClose']
-        X_train,X_test,y_train,y_test = train_test_split(X,y,shuffle=False,test_size=0.2)
+        X_train,X_test,y_train,y_test = train_test_split(X,y,shuffle=False)
         lr = LinearRegression()
         lr.fit(X_train,y_train)
         y_pred = lr.predict(X_test)
-        lists.append(y_pred[-1])
-    index = ['15m','30m','60m','90m']
+        lists1.append(y_pred[-1])
+        # ==============================================================
+    tickers=sym
+    enddate = dt.datetime.now()
+    startdate = enddate - dt.timedelta(days=15000)
+    lists2 = []
+    for intervals in['1d','5d']:
+        data = yf.download(tickers=tickers, start=startdate, end=enddate, interval=intervals,progress=False)
+        data['NextClose'] = data['Close'].shift(-1)
+        data.reset_index(inplace=True)
+        data.dropna(inplace=True)
+        X = data[['Open','High','Low']]
+        y = data['NextClose']
+        X_train,X_test,y_train,y_test = train_test_split(X,y,shuffle=False)
+        lr = LinearRegression()
+        lr.fit(X_train,y_train)
+        y_pred = lr.predict(X_test)
+        lists2.append(y_pred[-1])
+        # ===============================================================
+    tickers=sym
+    enddate = dt.datetime.now()
+    startdate = enddate - dt.timedelta(weeks=1000)
+    lists3 = []
+    for intervals in['1wk']:
+        data = yf.download(tickers=tickers, start=startdate, end=enddate, interval=intervals,progress=False)
+        data['NextClose'] = data['Close'].shift(-1)
+        data.reset_index(inplace=True)
+        data.dropna(inplace=True)
+        X = data[['Open','High','Low']]
+        y = data['NextClose']
+        X_train,X_test,y_train,y_test = train_test_split(X,y,shuffle=False)
+        lr = LinearRegression()
+        lr.fit(X_train,y_train)
+        y_pred = lr.predict(X_test)
+        lists3.append(y_pred[-1])
+        # ===================================================================
+    tickers=sym
+    enddate = dt.datetime.now()
+    startdate = enddate - dt.timedelta(weeks=1000)
+    lists4 = []
+    for intervals in['1mo']:
+        data = yf.download(tickers=tickers, start=startdate, end=enddate, interval=intervals,progress=False)
+        data['NextClose'] = data['Close'].shift(-1)
+        data.reset_index(inplace=True)
+        data.dropna(inplace=True)
+        X = data[['Open','High','Low']]
+        y = data['NextClose']
+        X_train,X_test,y_train,y_test = train_test_split(X,y,shuffle=False)
+        lr = LinearRegression()
+        lr.fit(X_train,y_train)
+        y_pred = lr.predict(X_test)
+        lists4.append(y_pred[-1])
+    index = ['15m','30m','60m','90m','1d','5d','1wk','1mo']
+    lists = lists1+lists2+lists3+lists4
     lists = pd.Series(lists).astype(float).round(5)
     lists.index = index
-    print('Prediction', tickers)
     print(lists)
 
 
-# In[76]:
+# In[11]:
 
 
 def sr_lv(sym):
@@ -120,17 +166,26 @@ def sr_lv(sym):
     print(round(pd.Series(sr).sort_values(ascending=False),5))
 
 
-# In[77]:
+# In[12]:
 
 
-for x in lists:
-    get_pred(x)
-    sr_lv(x)
-    print('-'*30)
+print('Supported Symbols: \n'
+      '\n'
+      'EURUSD=x, GBPUSD=x,USDJPY=x \n'
+      'USDCHF=x, USDCAD=x, AUDUSD=x \n' 
+      'NZDUSD=x \n'
+      '\n'
+      'Data refresh every 30 mins'
+      '\n')
+sym = input(f"Enter symbol: ")
 
 
 # In[ ]:
 
 
-
+while True:
+    get_pred(sym)
+    sr_lv(sym)
+    print('-'*30)
+    time.sleep(1800)
 
