@@ -67,5 +67,9 @@ Data leakage is unlikely
 You could make profit even if your win rate is 40% (even lower than coin flipping)
 
 [prednow.py](https://github.com/CoryMink/passive_income_capstone/blob/main/prednow.py)
-Close Price Prediction in 15m,30m,60m, and 90m
+Symbol input with by the list of supported symbols \
+Close Price Prediction in 15m,30m,60m,90m,1day,5day,1,week,1month
 Support/Resistance levels in 180 days
+
+[prediction](https://github.com/CoryMink/passive_income_capstone/blob/main/prediction.py)
+Streammlit version of prednow.py
